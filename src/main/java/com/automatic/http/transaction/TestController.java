@@ -12,8 +12,8 @@ public class TestController {
 
     @ResponseBody
     @RequestMapping(value = "", method = RequestMethod.GET, produces = "application/json")
-    public String testAutomaticRestTransactional() {
-        return testService.testAutomaticRestTransactional();
+    public String testAutomaticRestTransactional(String msg) {
+        return testService.testAutomaticRestTransactional(msg);
     }
 
 }

@@ -1,10 +1,11 @@
 package com.automatic.http.transaction.obj;
 
-import org.apache.http.HttpHeaders;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,9 @@ public class ClientRequests {
     private List<ClientRequest> clientRequests;
     private ClientRequest clientRequest;
 
-    public ClientRequests init() {
+    @PostConstruct
+    public void init() {
         this.clientRequests = new ArrayList<>();
-        return this;
     }
 
     public ClientRequests create() {
@@ -50,8 +51,17 @@ public class ClientRequests {
         return this;
     }
 
+    public ClientRequests transaction(TransactionType transaction) {
+        this.clientRequest.setTransaction(transaction);
+        return this;
+    }
+
     public ClientRequests add() {
         this.clientRequests.add(this.clientRequest);
         return this;
+    }
+
+    public List<ClientRequest> getClientRequests() {
+        return clientRequests;
     }
 }
