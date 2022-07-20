@@ -6,8 +6,26 @@
 <br/>
 
 # Function Release
+- 2022.07.20
+  - TranscationType.COMMIT HTTP 통신 Transcation 기능 구현
 
 
 <br/>
 
 # How To Use
+- 2022.07.20
+``` Java
+@Autowired
+private ClientRequests clientRequests;
+
+@RestTransactional
+clientRequests
+    .create()
+    .url("http://localhost:8080/api).method(MethodType.POST)
+    .header(httpHeader).clazz(Response.class).transaction(TransactionType.COMMIT)
+    .add();
+```
+  - HTTP 통신 Transaction 을 사용하고자 하는 메소드에 @RestTransactional Anootation을 작성합니다.
+  - 한 리퀘스트당 N개의 HTTP 요청을 할 수 있으며, create()와 add() 함수를 이용합니다.
+  - HTTP 통신에 필요한 각종 파라미터 (url, method, header, claszz 값들을 설정해 줍니다.
+  - 메소드가 예외 없이 정상 종료된다면 설정한 HTTP 요청들을 요청합니다.
