@@ -1,8 +1,9 @@
 package com.automatic.http.transaction.conf;
 
-import com.automatic.http.transaction.obj.ClientRequest;
+import com.automatic.http.transaction.obj.ClientCommitRequest;
 import com.automatic.http.transaction.obj.ClientRequests;
-import com.automatic.http.transaction.obj.TransactionType;
+import com.automatic.http.transaction.obj.ClientRollbackRequest;
+import com.automatic.http.transaction.obj.ResponseObj;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -25,11 +26,9 @@ public class TransactionManager {
     public void transactionalReturning() {  // Transaction type is commit
         log.info("start request transaction type is commit ..");
 
-        List<ClientRequest> requests = clientRequests.getClientRequests();
-        for (ClientRequest request : requests) {
-            if (request.getTransaction().equals(TransactionType.COMMIT)) {
-                requestManager.request(request);
-            }
+        List<ClientCommitRequest> requests = clientRequests.getCommittedClientRequests();
+        for (ClientCommitRequest request : requests) {
+            requestManager.request(request);
         }
     }
 
@@ -37,12 +36,18 @@ public class TransactionManager {
     public void transactionalThrowing() {   // Transaction type is rollback
         log.info("start request transaction type is rollback ..");
 
-        List<ClientRequest> requests = clientRequests.getClientRequests();
-        for (ClientRequest request : requests) {
-            if (request.getTransaction().equals(TransactionType.ROLLBACK)) {
+        List<ClientRollbackRequest> requests = clientRequests.getRollbackClientRequests();
+        for (ClientRollbackRequest request : requests) {
 
-            }
         }
     }
 
+    public <T> T run() {
+        return (T) run(clientRequests.getRollbackRequest().getClazz());
+    }
+
+    public <T> T run(Class<T> response) {
+        Object obj = new ResponseObj();
+        return (T) obj;
+    }
 }

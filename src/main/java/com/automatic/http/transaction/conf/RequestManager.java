@@ -1,12 +1,13 @@
 package com.automatic.http.transaction.conf;
 
-import com.automatic.http.transaction.obj.ClientRequest;
+import com.automatic.http.transaction.obj.ClientCommitRequest;
 import com.automatic.http.transaction.obj.RestClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,36 +18,38 @@ public class RequestManager<T> {
 
     private final RestClient restClient;
 
-    public void request(ClientRequest request) {
+    public void request(ClientCommitRequest request) {
         log.info("request info [" + request + "]");
         switch (request.getMethod()) {
             case POST:
-                post(request.getUrl(), request.getHeader(), request.getBody(), request.getClazz());
-                break;
+                callApiEndpoint(
+                        request.getUrl(),
+                        HttpMethod.POST,
+                        request.getHeader(),
+                        request.getBody(),
+                        request.getClazz());
+                return;
             case PUT:
-                put(request.getUrl(), request.getHeader(), request.getBody(), request.getClazz());
-                break;
+                callApiEndpoint(
+                        request.getUrl(),
+                        HttpMethod.PUT,
+                        request.getHeader(),
+                        request.getBody(),
+                        request.getClazz());
+                return;
             case DELETE:
-                delete(request.getUrl(), request.getHeader(), request.getBody(), request.getClazz());
-                break;
+                callApiEndpoint(
+                        request.getUrl(),
+                        HttpMethod.DELETE,
+                        request.getHeader(),
+                        request.getBody(),
+                        request.getClazz());
         }
     }
 
-    private void post(String url, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
-        callApiEndpoint(url, HttpMethod.POST, httpHeaders, body, clazz);
-    }
-
-    private void delete(String url, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
-        callApiEndpoint(url, HttpMethod.DELETE, httpHeaders, body, clazz);
-    }
-
-    private void put(String url, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
-        callApiEndpoint(url, HttpMethod.PUT, httpHeaders, body, clazz);
-    }
-
-    private void callApiEndpoint(String url, HttpMethod httpMethod, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
+    private ResponseEntity<T> callApiEndpoint(String url, HttpMethod httpMethod, HttpHeaders httpHeaders, Object body, Class<T> clazz) {
         RestTemplate restTemplate = restClient.getRestTemplate();
-        restTemplate.exchange(url, httpMethod, new HttpEntity<>(body, httpHeaders), clazz);
+        return restTemplate.exchange(url, httpMethod, new HttpEntity<>(body, httpHeaders), clazz);
     }
 
 }
