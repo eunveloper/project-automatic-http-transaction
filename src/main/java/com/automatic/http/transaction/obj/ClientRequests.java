@@ -1,5 +1,6 @@
 package com.automatic.http.transaction.obj;
 
+import lombok.Getter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpHeaders;
@@ -10,58 +11,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Getter
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ClientRequests {
 
-    private List<ClientRequest> clientRequests;
-    private ClientRequest clientRequest;
+    private List<ClientCommitRequest> committedClientRequests;
+    private ClientCommitRequest committedRequest;
+    private List<ClientRollbackRequest> rollbackClientRequests;
+    private ClientRollbackRequest rollbackRequest;
 
     @PostConstruct
     public void init() {
-        this.clientRequests = new ArrayList<>();
+        this.committedClientRequests = new ArrayList<>();
+        this.rollbackClientRequests = new ArrayList<>();
     }
 
-    public ClientRequests create() {
-        this.clientRequest = new ClientRequest();
-        return this;
+    public ClientRequest create(TransactionType transactionType) {
+        switch (transactionType) {
+            case COMMIT:
+                return ClientCommitRequest.builder().build();
+            case ROLLBACK:
+                return ClientRollbackRequest.builder().build();
+        }
+        return null;
     }
 
     public ClientRequests url(String url) {
-        this.clientRequest.setUrl(url);
+        this.committedRequest.setUrl(url);
         return this;
     }
 
     public ClientRequests method(MethodType method) {
-        this.clientRequest.setMethod(method);
+        this.committedRequest.setMethod(method);
         return this;
     }
 
     public ClientRequests header(HttpHeaders header) {
-        this.clientRequest.setHeader(header);
+        this.committedRequest.setHeader(header);
         return this;
     }
 
     public ClientRequests body(Object body) {
-        this.clientRequest.setBody(body);
+        this.committedRequest.setBody(body);
         return this;
     }
 
     public ClientRequests clazz(Class clazz) {
-        this.clientRequest.setClazz(clazz);
-        return this;
-    }
-
-    public ClientRequests transaction(TransactionType transaction) {
-        this.clientRequest.setTransaction(transaction);
+        this.committedRequest.setClazz(clazz);
         return this;
     }
 
     public ClientRequests add() {
-        this.clientRequests.add(this.clientRequest);
+        this.committedClientRequests.add(this.committedRequest);
+        this.committedRequest = null;
         return this;
     }
 
-    public List<ClientRequest> getClientRequests() {
-        return clientRequests;
-    }
 }
